@@ -17,6 +17,8 @@ jQuery(function(){
 				return scrollTo(jQuery(this).offset().top - 50);
 			}
 		});
+
+		jQuery(".list-group-item").css({visibility:'visible'});
 	}
 
 	scrollToNow();
@@ -29,7 +31,7 @@ jQuery(function(){
 
 	//ajax
 	jQuery(".navbar").on("change", "select", function(){
-		$.get("/ajax", { day: jQuery("#day").val(), city: jQuery("#city").val() }, function(data){
+		jQuery.get("/ajax", { day: jQuery("#day").val(), city: jQuery("#city").val() }, function(data){
 			jQuery(".list-group").html(data);
 			scrollToNow();
 		});
