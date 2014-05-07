@@ -29,11 +29,12 @@ jQuery(function(){
 		return false;
 	}
 
-	//ajax
+	/*ajax
 	jQuery(".navbar").on("change", "select", function(){
 		jQuery.get("/ajax", { day: jQuery("#day").val(), city: jQuery("#city").val() }, function(data){
 			jQuery(".list-group").html(data);
 			scrollToNow();
 		});
 	});
+	*/
 });

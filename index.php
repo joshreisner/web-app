@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" ng-app>
+<html lang="en" data-ng-app="meetingsApp">
 	<head>
 	    <meta charset="UTF-8">
 		<meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,34 +10,8 @@
 		<link rel="apple-touch-startup-image" href="<?php echo get_template_directory_uri()?>/assets/img/startup.png">
 		<link rel="apple-touch-startup-image" href="<?php echo get_template_directory_uri()?>/assets/img/startup-640-1096.png" sizes="640x1096">
 		<?php wp_head()?>
-		<?php
-		$meetings = get_posts(array(
-			'post_type'		=>'meetings',
-			'numberposts'	=>-1,
-			'orderby'		=>'meta_value',
-			'meta_key'		=>'time',
-			'order'			=>'asc',
-		));
-		foreach ($meetings as &$meeting) {
-			$custom = get_post_meta($meeting->ID);
-			list($hours, $minutes) = explode(':', $custom['time'][0]);
-			$meeting = array(
-				'title'			=>$meeting->post_title,
-				'map'			=>'http://maps.apple.com/?q=' . urlencode($custom['address'][0]),
-				'time_formatted'=>meetings_format_time($custom['time'][0]),
-				'hours'			=>$hours,
-				'minutes'		=>$minutes,
-				'location'		=>$custom['location'][0],
-				'region'		=>$custom['region'][0],
-				'address'		=>substr($custom['address'][0], 0, strpos($custom['address'][0], ',')),
-			);
-		}
-		?>
-		<script>
-		var meetings = <?php echo json_encode($meetings)?>
-		</script>
 	</head>
-	<body>
+	<body data-ng-controller="meetingsCtrl">
 	    <div class="container">
 			<div class="navbar navbar-default navbar-fixed-top">
 				<form class="navbar-form row">
