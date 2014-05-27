@@ -15,7 +15,13 @@ body .list-group {
   body .list-group .list-group-item {
     border-radius: 0;
     overflow: auto;
-    padding-right: 15px; }
+    padding-right: 15px;
+    border-right: 0;
+    border-left: 0;
+    position: relative; }
+    body .list-group .list-group-item div.anchor {
+      position: absolute;
+      top: -50px; }
     body .list-group .list-group-item h4 {
       font-weight: bold;
       padding: 0;
@@ -48,3 +54,5 @@ body .list-group {
         body .list-group .list-group-item div.content address a {
           color: #555;
           text-transform: none; }
+    body .list-group .list-group-item:last-child {
+      border-bottom: 0; }

@@ -1,40 +1,59 @@
-jQuery(function(){
-	
-	function scrollToNow() {
-		var d = new Date();
-		var h = d.getHours();
-		var m = d.getMinutes();
-		var w = d.getDay();
+angular.module('meetingsApp', [])
+.controller('meetingsCtrl', function($scope, $http, $location, $anchorScroll) {
 
-		var days = [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ];
+	//set some variables
+    var now = new Date();
+    var hours = now.getHours() + "";
+    var minutes = now.getMinutes() + "";
+    if (hours.length == 1) hours = "0" + hours;
+    if (minutes.length == 1) minutes = "0" + minutes;
+    time = hours + ":" + minutes;
+    //console.log(time);
+	$scope.selected_day = now.getDay();
+    $scope.selected_region = "";
 
-		if (jQuery("#day").val() != days[w]) return scrollTo(0);
+	//get meeting list
+    $http.get("//aasanjose.dev/wp-admin/admin-ajax.php?action=meetings")
+    .success(function(data, status, headers, config) {
+        $scope.meetings = data;
 
-		jQuery(".list-group-item").each(function(){
-			if ((jQuery(this).attr("data-hours") == h) && (jQuery(this).attr("data-minutes") > m)) {
-				return scrollTo(jQuery(this).offset().top - 50);
-			} else if (jQuery(this).attr("data-hours") > h) {
-				return scrollTo(jQuery(this).offset().top - 50);
+        //scroll to
+        var scrollTo = false;
+		angular.forEach(data, function(value) {
+			if (!scrollTo && value.time >= time) {
+				//console.log(value.time + ' > ' + time + ' so scrolling to ' + value.name);
+				scrollTo = value.id;
+				$location.hash(value.id);
+			    $anchorScroll();
 			}
-		});
+		}, scrollTo, time);
+    });
 
-		jQuery(".list-group-item").css({visibility:'visible'});
-	}
+    //populate days dropdown
+    $scope.days = [
+    	{ id: 0, value: "Sunday" }, 
+    	{ id: 1, value: "Monday" },
+    	{ id: 2, value: "Tuesday" }, 
+    	{ id: 3, value: "Wednesday" }, 
+    	{ id: 4, value: "Thursday" },
+    	{ id: 5, value: "Friday" }, 
+    	{ id: 6, value: "Saturday" }
+    ];
 
-	scrollToNow();
+	//get regions list
+    $http.get("//aasanjose.dev/wp-admin/admin-ajax.php?action=regions")
+    .success(function(data, status, headers, config) {
+        $scope.regions = data;
+    });
 
-	function scrollTo(y) {
-		jQuery("body").scrollTop(y);
-		jQuery(".list-group-item").css({visibility:'visible'});
-		return false;
-	}
+    $scope.format_time = function(time) {
+    	var time_parts = time.split(':');
+    	var hours = time_parts[0];
+    	var minutes = time_parts[1];
+    	if ((hours == '12') && (minutes == '00')) return 'Noon';
+    	if ((hours == 23) && (minutes == 59)) return 'Mid';
+    	if (hours < 12) return (hours - 0) + ':' + minutes + 'a';
+    	return (hours - 12) + ':' + minutes + 'p';
+    }
 
-	/*ajax
-	jQuery(".navbar").on("change", "select", function(){
-		jQuery.get("/ajax", { day: jQuery("#day").val(), city: jQuery("#city").val() }, function(data){
-			jQuery(".list-group").html(data);
-			scrollToNow();
-		});
-	});
-	*/
 });
