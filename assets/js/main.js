@@ -1,33 +1,15 @@
-angular.module('meetingsApp', [])
-.controller('meetingsCtrl', function($scope, $http, $location, $anchorScroll) {
+angular.module('meetingsApp', ['LocalStorageModule'])
+.controller('meetingsCtrl', function($scope, $http, $location, $anchorScroll, localStorageService) {
 
-	//set some variables
+	//set time variables
     var now = new Date();
     var hours = now.getHours() + "";
     var minutes = now.getMinutes() + "";
     if (hours.length == 1) hours = "0" + hours;
     if (minutes.length == 1) minutes = "0" + minutes;
     time = hours + ":" + minutes;
-    //console.log(time);
 	$scope.selected_day = now.getDay();
     $scope.selected_region = "";
-
-	//get meeting list
-    $http.get("//aasanjose.dev/wp-admin/admin-ajax.php?action=meetings")
-    .success(function(data, status, headers, config) {
-        $scope.meetings = data;
-
-        //scroll to
-        var scrollTo = false;
-		angular.forEach(data, function(value) {
-			if (!scrollTo && value.time >= time) {
-				//console.log(value.time + ' > ' + time + ' so scrolling to ' + value.name);
-				scrollTo = value.id;
-				$location.hash(value.id);
-			    $anchorScroll();
-			}
-		}, scrollTo, time);
-    });
 
     //populate days dropdown
     $scope.days = [
@@ -44,6 +26,25 @@ angular.module('meetingsApp', [])
     $http.get("//aasanjose.dev/wp-admin/admin-ajax.php?action=regions")
     .success(function(data, status, headers, config) {
         $scope.regions = data;
+    });
+
+	//get meeting list
+	$scope.meetings = localStorageService.get('meetings');
+    $http.get("//aasanjose.dev/wp-admin/admin-ajax.php?action=meetings")
+    .success(function(data, status, headers, config) {
+        $scope.meetings = data;
+		localStorageService.add('meetings', data);
+
+        //scroll to
+        var scrollTo = false;
+		angular.forEach(data, function(value) {
+			if (!scrollTo && ($scope.selected_day == value.day) && value.time >= time) {
+				//console.log(value.time + ' > ' + time + ' so scrolling to ' + value.name);
+				scrollTo = value.id;
+				$location.hash(value.id);
+			    $anchorScroll();
+			}
+		}, scrollTo, time);
     });
 
     $scope.format_time = function(time) {
