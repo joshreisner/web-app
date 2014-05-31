@@ -35,7 +35,7 @@
 				</form>
 			</div>
 			<ul class="list-group">
-				<li class="list-group-item" ng-repeat="meeting in filteredMeetings = (meetings | filter:{day:selected_day, region_id:selected_region} | orderBy:time)">
+				<li class="list-group-item" ng-cloak ng-repeat="meeting in filteredMeetings = (meetings | filter:{day:selected_day, region_id:selected_region} | orderBy:time)">
 					<div class="anchor" id="{{ meeting.id }}"></div>
 					<a href="#">
 						<h4>{{ format_time(meeting.time) }}</h4>
