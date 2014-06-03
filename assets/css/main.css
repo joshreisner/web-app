@@ -33,12 +33,12 @@ body .list-group {
       height: 70px;
       border-radius: 4px;
       margin: 0 10px 10px 0;
-      background-color: #eccc94;
-      color: #c48923; }
+      background-color: #b9d4ec;
+      color: #428bca; }
       body .list-group .list-group-item a:hover {
         text-decoration: none; }
       body .list-group .list-group-item a h4 {
-        background-color: #c48923;
+        background-color: #428bca;
         color: white;
         border-radius: 4px 4px 0 0;
         border-bottom: 1px solid white; }

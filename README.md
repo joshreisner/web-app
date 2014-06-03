@@ -1,4 +1,7 @@
-mobile
-======
+Web App
+=======
 
-Mobile-only meeting list demo
+Mobile-optimized web app meeting list. Uses AngularJS and local storage. Not intended for 
+desktop browsers. May be replaced by a native app.
+
+[Santa Clara Meeting List Web App](http://app.aasanjose.org/)

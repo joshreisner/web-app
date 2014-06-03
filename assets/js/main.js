@@ -1,4 +1,7 @@
 angular.module('meetingsApp', ['LocalStorageModule'])
+.filter('escape', function() {
+	return window.escape;
+})
 .controller('meetingsCtrl', function($scope, $http, $location, $anchorScroll, localStorageService) {
 
 	//set time variables
@@ -23,14 +26,16 @@ angular.module('meetingsApp', ['LocalStorageModule'])
     ];
 
 	//get regions list
-    $http.get("//aasanjose.dev/wp-admin/admin-ajax.php?action=regions")
+	$scope.regions = localStorageService.get('regions');
+    $http.get("http://aasanjose.org/wp-admin/admin-ajax.php?action=regions")
     .success(function(data, status, headers, config) {
         $scope.regions = data;
+		localStorageService.add('regions', data);
     });
 
 	//get meeting list
 	$scope.meetings = localStorageService.get('meetings');
-    $http.get("//aasanjose.dev/wp-admin/admin-ajax.php?action=meetings")
+    $http.get("http://aasanjose.org/wp-admin/admin-ajax.php?action=meetings")
     .success(function(data, status, headers, config) {
         $scope.meetings = data;
 		localStorageService.add('meetings', data);
