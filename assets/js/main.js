@@ -56,10 +56,18 @@ angular.module('meetingsApp', ['LocalStorageModule'])
     	var time_parts = time.split(':');
     	var hours = time_parts[0];
     	var minutes = time_parts[1];
-    	if ((hours == '12') && (minutes == '00')) return 'Noon';
+    	if ((hours == 12) && (minutes == 0)) return 'Noon';
     	if ((hours == 23) && (minutes == 59)) return 'Mid';
     	if (hours < 12) return (hours - 0) + ':' + minutes + 'a';
+    	if (hours == 12) return '12:' + minutes + 'p';
     	return (hours - 12) + ':' + minutes + 'p';
+    }
+
+    $scope.format_types = function(types) {
+    	for (var i = 0; i < types.length; i++) {
+    		if (types[i] == 'M') return "Men";
+    		if (types[i] == 'W') return "Women";
+    	}
     }
 
 });

@@ -42,7 +42,10 @@
 						<i class="glyphicon glyphicon-map-marker"></i>
 					</a>
 					<div class="content">
-						<h4 class="list-group-item-heading">{{ meeting.name }}</h4>
+						<h4 class="list-group-item-heading">
+							{{ meeting.name }}
+							<span ng-show="types = format_types(meeting.types)">{{ types }}</span>
+						</h4>
 						<address>
 							<div ng-hide="{{ meeting.location == meeting.address }}">{{ meeting.location }}</div>
 							<div>{{ meeting.address }}</div>
@@ -50,9 +53,10 @@
 						</address>
 					</div>
 				</li>
-				<!--<li ng-hide="filteredMeetings.length" class="empty">
+				<li ng-hide="!meetings.length || filteredMeetings.length" class="empty">
 					No meetings listed on {{ days[selected_day].value }} in {{ regions[selected_region].value }}.
-				</li>-->
+				</li>
+				<li ng-hide="meetings.length" class="loading"></li>
 			</ul>
 		</div>
 		<script src="/bower_components/angular/angular.min.js"></script>
