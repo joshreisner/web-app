@@ -15,9 +15,9 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "~3.1.1",
     "add-to-homescreen": "~3.0.1",
     "angular": "~1.2.16",
-    "angular-local-storage": "~0.0.5"
+    "angular-local-storage": "~0.0.5",
+    "bootstrap-sass": "~3.0.2"
   }
 }

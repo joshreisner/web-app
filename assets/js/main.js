@@ -1,3 +1,7 @@
+//= include ../../bower_components/add-to-homescreen/src/addtohomescreen.js
+//= include ../../bower_components/angular/angular.min.js
+//= include ../../bower_components/angular-local-storage/angular-local-storage.min.js
+
 angular.module('meetingsApp', ['LocalStorageModule'])
 .filter('escape', function() {
 	return window.escape;

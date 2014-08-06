@@ -9,15 +9,7 @@
 		<link rel="apple-touch-icon-precomposed" href="/assets/img/apple-touch-icon.png">
 		<link rel="apple-touch-startup-image" href="/assets/img/startup.png">
 		<link rel="apple-touch-startup-image" href="/assets/img/startup-640-1096.png" sizes="640x1096">
-		<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css">
-		<link rel="stylesheet" href="/assets/css/main.css">
-
-		<link rel="stylesheet" href="/bower_components/add-to-homescreen/style/addtohomescreen.css">
-		<script src="/bower_components/add-to-homescreen/src/addtohomescreen.min.js"></script>
-		<script>
-			addToHomescreen();
-		</script>
-
+		<link rel="stylesheet" href="/assets/css/main.min.css">
 	</head>
 	<body data-ng-controller="meetingsCtrl">
 		<div class="container">
@@ -59,10 +51,10 @@
 				<li ng-hide="meetings.length" class="loading"></li>
 			</ul>
 		</div>
-		<script src="/bower_components/angular/angular.min.js"></script>
-		<script src="/bower_components/angular-local-storage/angular-local-storage.min.js"></script>
-		<script src="/assets/js/main.js"></script>
+		<script src="/assets/js/main.min.js"></script>
 		<script>
+			addToHomescreen();
+
 		    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
 		    function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
 		    e=o.createElement(i);r=o.getElementsByTagName(i)[0];
