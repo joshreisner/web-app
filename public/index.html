@@ -22,7 +22,7 @@
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 						</button>
-						<a class="navbar-brand" ng-cloak ng-click="scroll_to_now()">{{ format_day() }}<span ng-if="format_region()">, </span>{{ format_region() }}</a>
+						<a class="navbar-brand" ng-cloak ng-click="reset_vars()">{{ format_day() }}<span ng-if="format_region()">, </span>{{ format_region() }}</a>
 					</div>
 					<div class="collapse navbar-collapse" id="collapse">
 						<ul class="nav navbar-nav">
@@ -37,9 +37,9 @@
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Location <span class="caret"></span></a>
 								<ul class="dropdown-menu" role="menu">
-									<!--<li><a href="#">Nearby (within 5 mi)</a></li>
-									<li><a href="#">Everywhere</a></li>
-									<li class="divider"></li>-->
+									<!--<li><a href="#">Nearby (within 5 mi)</a></li>-->
+									<li ng-class="{'active': (!selected_region)}"><a ng-click="set_region()">Everywhere</a></li>
+									<li class="divider"></li>
 									<li ng-repeat="region in regions" ng-class="{'active': (region.id == selected_region)}"><a ng-click="set_region(region)">{{ region.value }}</a></li>
 								</ul>
 							</li>
@@ -49,7 +49,7 @@
 			</nav>
 			<ul class="list-group">
 				<div class="height">
-					<li id="{{ meeting.id }}" class="list-group-item" ng-cloak ng-repeat="meeting in filteredMeetings = (meetings | filter:{day:selected_day, region_id:selected_region} | orderBy:['time','name'])">
+					<li id="meeting-{{ meeting.id }}" class="list-group-item" ng-cloak ng-repeat="meeting in filteredMeetings = (meetings | filter:{day:selected_day, region_id:selected_region} | orderBy:['time','name'])">
 						<a class="location" href="http://maps.apple.com/?q={{ meeting.address + ', ' + meeting.city + ', ' + meeting.state | escape }}">
 							<h4>{{ format_time(meeting.time) }}</h4>
 							<i class="glyphicon glyphicon-map-marker"></i>
@@ -67,8 +67,8 @@
 							<!--<i class="glyphicon glyphicon-chevron-right"></i>-->
 						</a>
 					</li>
-					<li ng-hide="!meetings.length || filteredMeetings.length" ng-cloak class="empty">
-						No meetings listed on {{ format_day() }} in {{ format_region() }}.
+					<li ng-hide="!meetings.length || filteredMeetings.length" class="empty">
+						<span ng-cloak>No meetings listed on {{ format_day() }} in {{ format_region() }}.</span>
 					</li>
 					<li ng-hide="meetings.length" class="loading"></li>
 				</div>

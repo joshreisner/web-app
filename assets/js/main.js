@@ -56,6 +56,7 @@ angular
 		$scope.get_next_meeting = function() {
 			if (typeof $scope.filteredMeetings === 'undefined') return false;
 			var timestring = $scope.now.getHours() + ':' + $scope.now.getMinutes() + ':' + $scope.now.getSeconds();
+			//var timestring = '06:55:12'; //should scroll you to a 7am meetings
 			for (var i = 0; i < $scope.filteredMeetings.length; i++) {
 				if ($scope.filteredMeetings[i].time + ':00' > timestring) return $scope.filteredMeetings[i];
 			}
@@ -63,12 +64,19 @@ angular
 		}
 		
 		$scope.scroll_to_now = function() {
-			var target = (meeting = $scope.get_next_meeting()) ? $("#" + meeting.id).offset().top - 44 : 0;
-			if ($("div.height").height() <= $(window).height() - 44) target = 0;
-			window.console.log('scrolling to ' + target);
-			$('html, body').animate({
-				scrollTop: target
-			}, 0);
+			var target = (meeting = $scope.get_next_meeting()) ? $("#meeting-" + meeting.id).offset().top - 64 : 0;
+			var max = $("div.height").height();
+			if (max <= $(window).height() - 64) target = 0;
+			if (target > max) target = max;
+			//window.console.log('scrolling to ' + target);
+			var $target = $('html,body'); 
+			$target.animate({scrollTop: target}, 100);
+		}
+
+		$scope.reset_vars = function() {
+			$scope.selected_day = $scope.now.getDay();
+			$scope.selected_region = "";
+			$scope.scroll_to_now();
 		}
 
 		$scope.format_day = function() {
@@ -109,19 +117,19 @@ angular
 		}
 
 		$scope.set_region = function(region) {
-			$scope.selected_region = region.id;
+			$scope.selected_region = (typeof region === 'undefined') ? "" : region.id;
 		 	$("#collapse").collapse("hide");
 		}
 
 	});
 
-	$(function(){
-		$(window).on('scroll', function() {
-			console.log( $(this).scrollTop()
-		);
+/* for debugging scroll
+$(function(){
+	$(window).on('scroll', function(){
+		window.console.log($(this).scrollTop());
 	});
+}); */
 
-})
 addToHomescreen();
 
 (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
