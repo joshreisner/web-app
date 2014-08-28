@@ -55,10 +55,12 @@ angular
 		
 		$scope.get_next_meeting = function() {
 			if (typeof $scope.filteredMeetings === 'undefined') return false;
-			var timestring = $scope.now.getHours() + ':' + $scope.now.getMinutes() + ':' + $scope.now.getSeconds();
-			//var timestring = '06:55:12'; //should scroll you to a 7am meetings
+			var timestring = ($scope.now.getHours() < 10 ? '0' : '') + $scope.now.getHours() + ':';
+			timestring += ($scope.now.getMinutes() < 10 ? '0' : '') + $scope.now.getMinutes();
+			//window.console.log(timestring);
+			//var timestring = '06:55'; //should scroll you to a 7am meeting
 			for (var i = 0; i < $scope.filteredMeetings.length; i++) {
-				if ($scope.filteredMeetings[i].time + ':00' > timestring) return $scope.filteredMeetings[i];
+				if ($scope.filteredMeetings[i].time >= timestring) return $scope.filteredMeetings[i];
 			}
 			return false;
 		}
