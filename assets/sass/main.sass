@@ -37,6 +37,7 @@ body
 
 	.list-group
 		margin: 63px -15px 0
+		position: relative
 		.list-group-item
 			border-radius: 0
 			overflow: auto
@@ -114,8 +115,12 @@ body
 
 		li.loading
 			list-style-type: none
-			background: url(/assets/img/spinner.gif) center center no-repeat
-			height: 100% 
+			background: white url(/assets/img/spinner.gif) center center no-repeat
+			position: absolute
+			top: 0
+			bottom: 20px
+			left: 0
+			right: 0
 
 			&:last-child
 				border-bottom: 0

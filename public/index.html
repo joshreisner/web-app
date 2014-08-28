@@ -67,10 +67,10 @@
 							<!--<i class="glyphicon glyphicon-chevron-right"></i>-->
 						</a>
 					</li>
-					<li ng-hide="!meetings.length || filteredMeetings.length" class="empty">
+					<li ng-hide="meetings.length" class="list-group-item loading"></li>
+					<li ng-hide="filteredMeetings.length" class="empty">
 						<span ng-cloak>No meetings listed on {{ format_day() }} in {{ format_region() }}.</span>
 					</li>
-					<li ng-hide="meetings.length" class="loading"></li>
 				</div>
 			</ul>
 		</div>
