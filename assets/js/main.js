@@ -1,21 +1,35 @@
 //= include ../../bower_components/add-to-homescreen/src/addtohomescreen.js
 //= include ../../bower_components/angular/angular.min.js
+//= include ../../bower_components/angular-route/angular-route.js
 //= include ../../bower_components/angular-local-storage/angular-local-storage.min.js
 //= include ../../bower_components/jquery/dist/jquery.js
 //= include ../../bower_components/bootstrap-sass/dist/js/bootstrap.js
 
 angular
-	.module('meetingsApp', ['LocalStorageModule'])
+	.module('meetingsApp', ['ngRoute', 'LocalStorageModule'])
 	.filter('escape', function() {
 		return window.escape;
 	})
-	/*.config(function($routeProvider, $locationProvider) {
-		$locationProvider.html5Mode(true);
-		$routeProvider
-			.when('/page1', { template: 'page1.html', controller: 'Page1Ctrl' })
-			.when('/page2', { template: 'page2.html', controller: 'Page2Ctrl' })
-	})*/
-	.controller('meetingsCtrl', function($scope, $http, $location, localStorageService) {
+	.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+		$routeProvider.
+			when('/', {
+				templateUrl: '/partials/meetings.html',
+				controller: 'meetingsCtrl'
+			}).
+			when('/meetings/:slug', {
+				templateUrl: '/partials/meeting-detail.html',
+				controller: 'meetingDetailCtrl'
+			}).
+			otherwise({
+				redirectTo: '/'
+			});
+	    $locationProvider.html5Mode(true);
+	}])
+	.controller('meetingDetailCtrl', ['$scope', '$routeParams', function($scope, $routeParams) {
+		$scope.slug = $routeParams.slug;
+		window.console.log('slug was ' + $scope.slug);
+	}])
+	.controller('meetingsCtrl', ['$scope', '$http', '$location', 'localStorageService', function($scope, $http, $location, localStorageService) {
 
 		//initialize
 		$scope.now = new Date();
@@ -79,6 +93,7 @@ angular
 			$scope.selected_day = $scope.now.getDay();
 			$scope.selected_region = "";
 			$scope.scroll_to_now();
+		 	if ($("#collapse").hasClass("in")) $("#collapse").collapse("hide");
 		}
 
 		$scope.format_day = function() {
@@ -123,7 +138,7 @@ angular
 		 	$("#collapse").collapse("hide");
 		}
 
-	});
+	}]);
 
 /* for debugging scroll
 $(function(){
