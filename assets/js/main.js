@@ -25,7 +25,11 @@ angular
 			});
 	    $locationProvider.html5Mode(true);
 	}])
-	.controller('meetingDetailCtrl', ['$scope', '$routeParams', function($scope, $routeParams) {
+	.controller('meetingDetailCtrl', ['$scope', '$routeParams', '$window', '$location', function($scope, $routeParams, $window, $location) {
+
+		$scope.$on('$viewContentLoaded', function(event) {
+			$window.ga('send', 'pageview', { page: $location.path() });
+		});
 
 		//get current meeting info
 		$scope.getMeeting = function(slug) {
@@ -74,8 +78,6 @@ angular
 			'W': 'Women Only',
 			'Y': 'Young People'
 		}
-
-		console.log($scope.meeting.types);
 
 		$('html,body').animate({scrollTop: 0}, 0);
 
