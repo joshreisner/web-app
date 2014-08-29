@@ -16,6 +16,10 @@ angular
 				templateUrl: '/partials/meetings.html',
 				controller: 'meetingsCtrl'
 			}).
+			when('/help', {
+				templateUrl: '/partials/help.html',
+				controller: 'helpCtrl'
+			}).
 			when('/meetings/:slug', {
 				templateUrl: '/partials/meeting-detail.html',
 				controller: 'meetingDetailCtrl'
@@ -24,6 +28,8 @@ angular
 				redirectTo: '/'
 			});
 	    $locationProvider.html5Mode(true);
+	}])
+	.controller('helpCtrl', [function() {
 	}])
 	.controller('meetingDetailCtrl', ['$scope', '$routeParams', '$window', '$location', function($scope, $routeParams, $window, $location) {
 
