@@ -20,7 +20,17 @@
 			</a>
 		</address>
 
-		<div class="alert alert-info" ng-bind="getDistanceInMi()"></div>
+		<div class="alert alert-info" ng-if="meeting.distance > 0">
+			<i class="glyphicon glyphicon-map-marker"></i> <a class="alert-link" href="http://maps.apple.com/?q={{ meeting.address + ', ' + meeting.city + ', ' + meeting.state | escape }}">{{ meeting.distance }} miles</a> from your current location
+		</div>
+
+		<div class="alert alert-warning" ng-if="meeting.distance === null">
+			Loading distance&hellip;
+		</div>		
+
+		<div class="alert alert-danger" ng-if="meeting.distance === false">
+			Could not determine location
+		</div>		
 
 		<ul ng-if="meeting.types">
 			<li ng-repeat="type in meeting.types"><i class="glyphicon glyphicon-ok"></i> {{ types[type.trim()] }}</li>

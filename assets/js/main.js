@@ -38,10 +38,12 @@ angular
 			}
 			//todo redirect on 404
 		}
-		
+
+		$scope.meeting = $scope.getMeeting($routeParams.slug);
+
 		$scope.getDistanceInMi = function() {
-			if ($scope.userLocation === false) return 'Could not get distance';
-			if ($scope.userLocation === null) return 'Loading location...';
+			if ($scope.userLocation === false) return false;
+			if ($scope.userLocation === null) return null;
 			var lat1 = $scope.userLocation.latitude;
 			var lon1 = $scope.userLocation.longitude;
 			var lat2 = $scope.meeting.latitude;
@@ -55,14 +57,14 @@ angular
 				Math.sin(dLon/2) * Math.sin(dLon/2); 
 			var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
 			var d = R * c; // Distance in km
-			return Math.round((d * 0.621371) * 100) / 100 + ' miles from your current location';
+			return Math.round((d * 0.621371) * 100) / 100;
 		}
 
+		$scope.meeting.distance = $scope.getDistanceInMi();
+		
 		function deg2rad(deg) {
 			return deg * (Math.PI/180);
 		}
-
-		$scope.meeting = $scope.getMeeting($routeParams.slug);
 
 		//window.console.log($scope.meeting);
 
