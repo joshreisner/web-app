@@ -26,8 +26,32 @@ angular
 	    $locationProvider.html5Mode(true);
 	}])
 	.controller('meetingDetailCtrl', ['$scope', '$routeParams', function($scope, $routeParams) {
-		$scope.slug = $routeParams.slug;
-		window.console.log('slug was ' + $scope.slug);
+		$scope.getMeeting = function(slug) {
+			for (var i = 0; i < $scope.meetings.length; i++) {
+				if ($scope.meetings[i].slug == slug) return $scope.meetings[i];
+			}
+			//todo redirect on 404
+		}
+		
+		$scope.meeting = $scope.getMeeting($routeParams.slug);
+
+		window.console.log($scope.meeting);
+
+		$scope.types = {
+			'H': 'Chips', 
+			'C': 'Closed', 
+			'G': 'Gay',
+			'L': 'Lesbian',
+			'M': 'Men Only', 
+			'O': 'Open',
+			'S': 'Spanish',
+			'X': 'Wheelchair Accessible',
+			'W': 'Women Only',
+			'Y': 'Young People'
+		}
+
+		$('html,body').animate({scrollTop: 0}, 100);
+
 	}])
 	.controller('meetingsCtrl', ['$scope', '$http', '$location', 'localStorageService', function($scope, $http, $location, localStorageService) {
 
@@ -85,8 +109,7 @@ angular
 			if (max <= $(window).height() - 64) target = 0;
 			if (target > max) target = max;
 			//window.console.log('scrolling to ' + target);
-			var $target = $('html,body'); 
-			$target.animate({scrollTop: target}, 100);
+			$('html,body').animate({scrollTop: target}, 100);
 		}
 
 		$scope.reset_vars = function() {
