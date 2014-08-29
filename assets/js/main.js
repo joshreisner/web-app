@@ -108,27 +108,9 @@ angular
 			{ id: 6, value: "Saturday" }
 		];
 
-		//get regions list
+		//get stuff out of local storage
 		$scope.regions = localStorageService.get('regions');
-		$http.get("http://aasanjose.org/wp-admin/admin-ajax.php?action=regions")
-		.success(function(data, status, headers, config) {
-			$scope.regions = data;
-			localStorageService.add('regions', data);
-		});
-
-		//get meeting list
 		$scope.meetings = localStorageService.get('meetings');
-		$http.get("http://aasanjose.org/wp-admin/admin-ajax.php?action=meetings")
-		.success(function(data, status, headers, config) {
-			$scope.meetings = data;
-
-			//pre-format the meeting types, because on-the-fly formatting was throwing off scroll
-			for (var i = 0; i < $scope.meetings.length; i++) {
-				$scope.meetings[i].types_formatted = $scope.format_types($scope.meetings[i].types);
-			}
-
-			localStorageService.add('meetings', data);
-		});
 
 		//get user's location
 		$scope.userLocation = null;
@@ -140,6 +122,7 @@ angular
 			$scope.userLocation = false;
 		}
 
+		//scroll to current time when filter is updated
 		$scope.$watch('filteredMeetings', function() {
 		     $scope.scroll_to_now();
 		}, true);
@@ -215,6 +198,43 @@ angular
 		 	$("#collapse").collapse("hide");
 		}
 
+		//update meetings & regions from our WordPress API (also open source)
+		$http
+			.get("http://aasanjose.org/wp-admin/admin-ajax.php?action=meetings")
+			.success(function(data, status, headers, config) {
+				$scope.meetings = data;
+
+				var regions = new Array();
+				var regionKeys = new Array(); //faster, i think, than looping
+
+				for (var i = 0; i < $scope.meetings.length; i++) {
+					//pre-format the meeting types, because on-the-fly formatting was throwing off scroll
+					$scope.meetings[i].types_formatted = $scope.format_types($scope.meetings[i].types);
+
+					//remember region
+					if (regionKeys.indexOf($scope.meetings[i].region) == -1) {
+						regionKeys[regionKeys.length] = $scope.meetings[i].region;
+						regions[regions.length] = {
+							id: $scope.meetings[i].region_id,
+							value: $scope.meetings[i].region
+						}
+					}
+				}
+
+				//sort regions by object value
+				function compare(a, b) {
+					if (a.value < b.value) return -1;
+					if (a.value > b.value) return 1;
+					return 0;
+				}
+				regions.sort(compare);
+
+				//export new regions variable and save to local storage
+				$scope.regions = regions;
+				localStorageService.add('meetings', data);
+				localStorageService.add('regions', regions);
+			});
+
 	}]);
 
 /* for debugging scroll
@@ -224,8 +244,10 @@ $(function(){
 	});
 }); */
 
+//run thingy to prompt saving web app
 addToHomescreen();
 
+//google analytics
 (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
 function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
 e=o.createElement(i);r=o.getElementsByTagName(i)[0];
