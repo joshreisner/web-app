@@ -7,7 +7,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" ng-cloak ng-click="reset_vars()">{{ format_day() }}<span ng-if="format_region()">, </span>{{ format_region() }}</a>
+			<a class="navbar-brand" ng-cloak ng-click="reset_vars()"><span ng-bind="format_day()"></span><span ng-if="format_region()">, </span><span ng-bind="format_region()"></span></a>
 		</div>
 		<div class="collapse navbar-collapse" id="collapse">
 			<ul class="nav navbar-nav">
@@ -44,7 +44,7 @@
 			<a class="content" href="/meetings/{{ meeting.slug }}">
 				<h4 class="list-group-item-heading">
 					{{ meeting.name }}
-					<span ng-show="types = format_types(meeting.types)">{{ types }}</span>
+					<span ng-show="meeting.types_formatted">{{ meeting.types_formatted }}</span>
 				</h4>
 				<address>
 					<div ng-hide="{{ meeting.location == meeting.address }}">{{ meeting.location }}</div>

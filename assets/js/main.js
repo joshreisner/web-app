@@ -1,8 +1,8 @@
+//= include ../../bower_components/jquery/dist/jquery.js
 //= include ../../bower_components/add-to-homescreen/src/addtohomescreen.js
 //= include ../../bower_components/angular/angular.min.js
 //= include ../../bower_components/angular-route/angular-route.js
 //= include ../../bower_components/angular-local-storage/angular-local-storage.min.js
-//= include ../../bower_components/jquery/dist/jquery.js
 //= include ../../bower_components/bootstrap-sass/dist/js/bootstrap.js
 
 angular
@@ -26,6 +26,8 @@ angular
 	    $locationProvider.html5Mode(true);
 	}])
 	.controller('meetingDetailCtrl', ['$scope', '$routeParams', function($scope, $routeParams) {
+
+		//get current meeting info
 		$scope.getMeeting = function(slug) {
 			for (var i = 0; i < $scope.meetings.length; i++) {
 				if ($scope.meetings[i].slug == slug) return $scope.meetings[i];
@@ -33,9 +35,32 @@ angular
 			//todo redirect on 404
 		}
 		
+		$scope.getDistanceInMi = function() {
+			if ($scope.userLocation === false) return 'Could not get distance';
+			if ($scope.userLocation === null) return 'Loading location...';
+			var lat1 = $scope.userLocation.latitude;
+			var lon1 = $scope.userLocation.longitude;
+			var lat2 = $scope.meeting.latitude;
+			var lon2 = $scope.meeting.longitude;
+			var R = 6371; // Radius of the earth in km
+			var dLat = deg2rad(lat2-lat1);  // deg2rad below
+			var dLon = deg2rad(lon2-lon1); 
+			var a = 
+				Math.sin(dLat/2) * Math.sin(dLat/2) +
+				Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+				Math.sin(dLon/2) * Math.sin(dLon/2); 
+			var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+			var d = R * c; // Distance in km
+			return Math.round((d * 0.621371) * 100) / 100 + ' miles from your current location';
+		}
+
+		function deg2rad(deg) {
+			return deg * (Math.PI/180);
+		}
+
 		$scope.meeting = $scope.getMeeting($routeParams.slug);
 
-		window.console.log($scope.meeting);
+		//window.console.log($scope.meeting);
 
 		$scope.types = {
 			'H': 'Chips', 
@@ -50,7 +75,9 @@ angular
 			'Y': 'Young People'
 		}
 
-		$('html,body').animate({scrollTop: 0}, 100);
+		console.log($scope.meeting.types);
+
+		$('html,body').animate({scrollTop: 0}, 0);
 
 	}])
 	.controller('meetingsCtrl', ['$scope', '$http', '$location', 'localStorageService', function($scope, $http, $location, localStorageService) {
@@ -84,8 +111,24 @@ angular
 		$http.get("http://aasanjose.org/wp-admin/admin-ajax.php?action=meetings")
 		.success(function(data, status, headers, config) {
 			$scope.meetings = data;
+
+			//pre-format the meeting types, because on-the-fly formatting was throwing off scroll
+			for (var i = 0; i < $scope.meetings.length; i++) {
+				$scope.meetings[i].types_formatted = $scope.format_types($scope.meetings[i].types);
+			}
+
 			localStorageService.add('meetings', data);
 		});
+
+		//get user's location
+		$scope.userLocation = null;
+		navigator.geolocation.getCurrentPosition(foundLocation, noLocation, { timeout: 10000 });
+		function foundLocation(position) {
+   			$scope.userLocation = position.coords;
+		}
+		function noLocation() {
+			$scope.userLocation = false;
+		}
 
 		$scope.$watch('filteredMeetings', function() {
 		     $scope.scroll_to_now();
@@ -109,7 +152,7 @@ angular
 			if (max <= $(window).height() - 64) target = 0;
 			if (target > max) target = max;
 			//window.console.log('scrolling to ' + target);
-			$('html,body').animate({scrollTop: target}, 100);
+			$('html,body').animate({scrollTop: target}, 0);
 		}
 
 		$scope.reset_vars = function() {
@@ -149,6 +192,7 @@ angular
 				if (types[i] == 'M') return "Men";
 				if (types[i] == 'W') return "Women";
 			}
+			return '';
 		}
 
 		$scope.set_day = function(day) {

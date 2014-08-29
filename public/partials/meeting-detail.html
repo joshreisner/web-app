@@ -5,33 +5,36 @@
 </nav>
 
 <div class="meeting-detail">
-	<h1>{{ meeting.name}}</h1>
+	<div ng-cloak>
+		<h1>{{ meeting.name}}</h1>
 
-	<h4>
-		{{ days[meeting.day].value }}s, {{ meeting.time_formatted }}
-	</h4>
+		<h4>
+			{{ days[meeting.day].value }}s, {{ meeting.time_formatted }}
+		</h4>
 
-	<address>
-		<a class="address" href="http://maps.apple.com/?q={{ meeting.address + ', ' + meeting.city + ', ' + meeting.state | escape }}">
-			<strong>{{ meeting.location }}</strong><br>
-			{{ meeting.address }}<br>
-			{{ meeting.city }}, {{ meeting.state }}
-		</a>
-	</address>
+		<address>
+			<a class="address" href="http://maps.apple.com/?q={{ meeting.address + ', ' + meeting.city + ', ' + meeting.state | escape }}">
+				<strong>{{ meeting.location }}</strong><br>
+				{{ meeting.address }}<br>
+				{{ meeting.city }}, {{ meeting.state }}
+			</a>
+		</address>
 
-	<ul ng-if="meeting.types">
-		<li ng-repeat="type in meeting.types"><i class="glyphicon glyphicon-ok"></i> {{ types[type] }}</li>
-	</ul>
+		<div class="alert alert-info" ng-bind="getDistanceInMi()"></div>
 
-	<!--<div class="row buttons">
-		<div class="col-xs-6">
-			<button class="btn btn-default btn-block" data-toggle="button"><i class="glyphicon glyphicon-star"></i> Favorite</button>
-		</div>
-		<div class="col-xs-6">
-			<button class="btn btn-default btn-block" href="sms:body="><i class="glyphicon glyphicon-phone"></i> Text Message</button>
-		</div>
-	</div>-->
+		<ul ng-if="meeting.types">
+			<li ng-repeat="type in meeting.types"><i class="glyphicon glyphicon-ok"></i> {{ types[type.trim()] }}</li>
+		</ul>
 
-	<a class="map" href="http://maps.apple.com/?q={{ meeting.address + ', ' + meeting.city + ', ' + meeting.state | escape }}"><img src="http://maps.googleapis.com/maps/api/staticmap?center={{ meeting.latitude }},{{ meeting.longitude }}&amp;zoom=15&amp;size=320x320&amp;maptype=roadmap&amp;markers=color:blue%7C{{ meeting.latitude }},{{ meeting.longitude }}" width="320" height="320"></a>
+		<!--<div class="row buttons">
+			<div class="col-xs-6">
+				<button class="btn btn-default btn-block" data-toggle="button"><i class="glyphicon glyphicon-star"></i> Favorite</button>
+			</div>
+			<div class="col-xs-6">
+				<button class="btn btn-default btn-block" href="sms:body="><i class="glyphicon glyphicon-phone"></i> Text Message</button>
+			</div>
+		</div>-->
 
+		<a class="map" href="http://maps.apple.com/?q={{ meeting.address + ', ' + meeting.city + ', ' + meeting.state | escape }}"><img src="http://maps.googleapis.com/maps/api/staticmap?center={{ meeting.latitude }},{{ meeting.longitude }}&amp;zoom=15&amp;size=320x320&amp;maptype=roadmap&amp;markers=color:blue%7C{{ meeting.latitude }},{{ meeting.longitude }}" width="320" height="320"></a>
+	</div>
 </div>
