@@ -24,7 +24,7 @@
 			<i class="glyphicon glyphicon-map-marker"></i> <a class="alert-link" href="http://maps.apple.com/?q={{ meeting.address + ', ' + meeting.city + ', ' + meeting.state | escape }}">{{ meeting.distance }} miles</a> from your current location
 		</div>
 
-		<div class="alert alert-warning" ng-if="meeting.distance === null">
+		<div class="alert alert-warning" ng-if="window.navigator.standalone && meeting.distance === null">
 			Loading distance&hellip;
 		</div>		
 

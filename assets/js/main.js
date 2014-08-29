@@ -114,12 +114,14 @@ angular
 
 		//get user's location
 		$scope.userLocation = null;
-		navigator.geolocation.getCurrentPosition(foundLocation, noLocation, { timeout: 10000 });
-		function foundLocation(position) {
-   			$scope.userLocation = position.coords;
-		}
-		function noLocation() {
-			$scope.userLocation = false;
+		if (window.navigator.standalone) {
+			navigator.geolocation.getCurrentPosition(foundLocation, noLocation, { timeout: 10000 });
+			function foundLocation(position) {
+	   			$scope.userLocation = position.coords;
+			}
+			function noLocation() {
+				$scope.userLocation = false;
+			}
 		}
 
 		//scroll to current time when filter is updated
