@@ -29,13 +29,169 @@ angular
 			});
 	    $locationProvider.html5Mode(true);
 	}])
-	.controller('helpCtrl', [function() {
+	.run(['$rootScope', '$http', 'localStorageService', function($rootScope, $http, localStorageService) {
+
+		//populate days dropdown
+		$rootScope.days = [
+			{ id: 0, value: "Sunday" }, 
+			{ id: 1, value: "Monday" },
+			{ id: 2, value: "Tuesday" }, 
+			{ id: 3, value: "Wednesday" }, 
+			{ id: 4, value: "Thursday" },
+			{ id: 5, value: "Friday" }, 
+			{ id: 6, value: "Saturday" }
+		];
+
+		//get stuff out of local storage
+		$rootScope.regions   = localStorageService.get('regions') || new Array();
+		$rootScope.meetings  = localStorageService.get('meetings') || new Array();
+		$rootScope.favorites = localStorageService.get('favorites') || new Array();
+
+		//get user's location
+		$rootScope.userLocation = null;
+		if (window.navigator.standalone) {
+			navigator.geolocation.getCurrentPosition(foundLocation, noLocation, { timeout: 10000 });
+			function foundLocation(position) {
+	   			$rootScope.userLocation = position.coords;
+			}
+			function noLocation() {
+				$rootScope.userLocation = false;
+			}
+		}
+
+		//update meetings & regions from our open source WordPress API
+		$http
+			.get("http://aasanjose.org/wp-admin/admin-ajax.php?action=meetings")
+			.success(function(data, status, headers, config) {
+				$rootScope.meetings = data;
+
+				var regions = new Array();
+				var regionKeys = new Array(); //faster, i think, than looping
+
+				for (var i = 0; i < $rootScope.meetings.length; i++) {
+					//pre-format the meeting types, because on-the-fly formatting was throwing off scroll
+					$rootScope.meetings[i].types_formatted = $rootScope.format_types($rootScope.meetings[i].types);
+
+					//set favorite
+					if ($rootScope.favorites) {
+						$rootScope.meetings[i].favorite	= ($rootScope.favorites.indexOf($rootScope.meetings[i].id) != -1);
+					} else {
+						$rootScope.meetings[i].favorite = false;
+					}
+
+					//remember region
+					if (regionKeys.indexOf($rootScope.meetings[i].region) == -1) {
+						regionKeys[regionKeys.length] = $rootScope.meetings[i].region;
+						regions[regions.length] = {
+							id: $rootScope.meetings[i].region_id,
+							value: $rootScope.meetings[i].region
+						}
+					}
+				}
+
+				//sort regions by object value
+				function compare(a, b) {
+					if (a.value < b.value) return -1;
+					if (a.value > b.value) return 1;
+					return 0;
+				}
+				regions.sort(compare);
+
+				//export new regions variable and save to local storage
+				$rootScope.regions = regions;
+				localStorageService.add('meetings', $rootScope.meetings);
+				localStorageService.add('regions', regions);
+			});
+
+		$rootScope.format_types = function(types) {
+			for (var i = 0; i < types.length; i++) {
+				if (types[i] == 'M') return "Men";
+				if (types[i] == 'W') return "Women";
+			}
+			return '';
+		}
+
 	}])
-	.controller('meetingDetailCtrl', ['$scope', '$routeParams', '$window', '$location', function($scope, $routeParams, $window, $location) {
+	.controller('meetingsCtrl', ['$scope', function($scope) {
+
+		//initialize
+		$scope.now = new Date();
+		$scope.selected_day = $scope.now.getDay();
+		$scope.selected_region = "";
+
+		//scroll to current time when filter is updated
+		$scope.$watch('filteredMeetings', function() {
+		     $scope.scroll_to_now();
+		}, true);
+		
+		$scope.get_next_meeting = function() {
+			if (typeof $scope.filteredMeetings === 'undefined') return false;
+			var timestring = ($scope.now.getHours() < 10 ? '0' : '') + $scope.now.getHours() + ':';
+			timestring += ($scope.now.getMinutes() < 10 ? '0' : '') + $scope.now.getMinutes();
+			//var timestring = '06:55'; //should scroll you to a 7am meeting
+			for (var i = 0; i < $scope.filteredMeetings.length; i++) {
+				if ($scope.filteredMeetings[i].time >= timestring) return $scope.filteredMeetings[i];
+			}
+			return false;
+		}
+		
+		$scope.scroll_to_now = function() {
+			var target = (meeting = $scope.get_next_meeting()) ? $("#meeting-" + meeting.id).offset().top - 64 : 0;
+			var max = $("div.height").height();
+			if (max <= $(window).height() - 64) target = 0;
+			if (target > max) target = max;
+			$('html,body').animate({scrollTop: target}, 0);
+		}
+
+		$scope.reset_vars = function() {
+			$scope.selected_day = $scope.now.getDay();
+			$scope.selected_region = "";
+			$scope.scroll_to_now();
+		 	if ($("#collapse").hasClass("in")) $("#collapse").collapse("hide");
+		}
+
+		$scope.format_day = function() {
+			//if ($scope.selected_day == '') return "Any Day";
+			return $scope.days[$scope.selected_day]['value'];
+		}
+
+		$scope.format_region = function() {
+			if ($scope.selected_region == '') return "";
+			for (var i = 0; i < $scope.regions.length; i++) {
+				if ($scope.regions[i].id == $scope.selected_region) {
+					return $scope.regions[i].value;
+				}
+			}
+		}
+
+		$scope.format_time = function(time) {
+			var time_parts = time.split(':');
+			var hours = time_parts[0];
+			var minutes = time_parts[1];
+			if ((hours == 12) && (minutes == 0)) return 'Noon';
+			if ((hours == 23) && (minutes == 59)) return 'Mid';
+			if (hours < 12) return (hours - 0) + ':' + minutes + 'a';
+			if (hours == 12) return '12:' + minutes + 'p';
+			return (hours - 12) + ':' + minutes + 'p';
+		}
+
+		$scope.set_day = function(day) {
+			$scope.selected_day = day.id;
+		 	$("#collapse").collapse("hide");
+		}
+
+		$scope.set_region = function(region) {
+			$scope.selected_region = (typeof region === 'undefined') ? "" : region.id;
+		 	$("#collapse").collapse("hide");
+		}
+	}])
+	.controller('meetingDetailCtrl', ['$scope', '$rootScope', '$routeParams', '$window', '$location', 'localStorageService', function($scope, $rootScope, $routeParams, $window, $location, localStorageService) {
 
 		$scope.$on('$viewContentLoaded', function(event) {
 			$window.ga('send', 'pageview', { page: $location.path() });
 		});
+
+		$('html,body').animate({scrollTop: 0}, 0);
 
 		//get current meeting info
 		$scope.getMeeting = function(slug) {
@@ -72,8 +228,6 @@ angular
 			return deg * (Math.PI/180);
 		}
 
-		//window.console.log($scope.meeting);
-
 		$scope.types = {
 			'H': 'Chips', 
 			'C': 'Closed', 
@@ -87,156 +241,35 @@ angular
 			'Y': 'Young People'
 		}
 
-		$('html,body').animate({scrollTop: 0}, 0);
+		$scope.set_favorite = function() {
+			if ($scope.meeting.favorite === true) {
+				//unfavorite
+				var i = $scope.favorites.indexOf($scope.meeting.id);
+				if (i != -1) $scope.favorites.splice(i, 1);
+				$scope.meeting.favorite = false;
+			} else {
+				//set
+				$scope.meeting.favorite = true;
+				var i = $scope.favorites.indexOf($scope.meeting.id);
+				if (i == -1) $scope.favorites[$scope.favorites.length] = $scope.meeting.id;
+			}
 
+			//save changes
+			for (var i = 0; i < $scope.meetings.length; i++) {
+				if ($scope.meetings[i].id == $scope.meeting.id) $scope.meetings[i].favorite = $scope.meeting.favorite;
+			}
+			
+			localStorageService.add('meetings', $scope.meetings);
+			localStorageService.add('favorites', $scope.favorites);
+
+		}
 	}])
-	.controller('meetingsCtrl', ['$scope', '$http', '$location', 'localStorageService', function($scope, $http, $location, localStorageService) {
+	.controller('helpCtrl', ['$window', '$location', function($window, $location) {
+		$scope.$on('$viewContentLoaded', function(event) {
+			$window.ga('send', 'pageview', { page: $location.path() });
+		});
 
-		//initialize
-		$scope.now = new Date();
-		$scope.selected_day = $scope.now.getDay();
-		$scope.selected_region = "";
-
-		//populate days dropdown
-		$scope.days = [
-			{ id: 0, value: "Sunday" }, 
-			{ id: 1, value: "Monday" },
-			{ id: 2, value: "Tuesday" }, 
-			{ id: 3, value: "Wednesday" }, 
-			{ id: 4, value: "Thursday" },
-			{ id: 5, value: "Friday" }, 
-			{ id: 6, value: "Saturday" }
-		];
-
-		//get stuff out of local storage
-		$scope.regions = localStorageService.get('regions');
-		$scope.meetings = localStorageService.get('meetings');
-
-		//get user's location
-		$scope.userLocation = null;
-		if (window.navigator.standalone) {
-			navigator.geolocation.getCurrentPosition(foundLocation, noLocation, { timeout: 10000 });
-			function foundLocation(position) {
-	   			$scope.userLocation = position.coords;
-			}
-			function noLocation() {
-				$scope.userLocation = false;
-			}
-		}
-
-		//scroll to current time when filter is updated
-		$scope.$watch('filteredMeetings', function() {
-		     $scope.scroll_to_now();
-		}, true);
-		
-		$scope.get_next_meeting = function() {
-			if (typeof $scope.filteredMeetings === 'undefined') return false;
-			var timestring = ($scope.now.getHours() < 10 ? '0' : '') + $scope.now.getHours() + ':';
-			timestring += ($scope.now.getMinutes() < 10 ? '0' : '') + $scope.now.getMinutes();
-			//window.console.log(timestring);
-			//var timestring = '06:55'; //should scroll you to a 7am meeting
-			for (var i = 0; i < $scope.filteredMeetings.length; i++) {
-				if ($scope.filteredMeetings[i].time >= timestring) return $scope.filteredMeetings[i];
-			}
-			return false;
-		}
-		
-		$scope.scroll_to_now = function() {
-			var target = (meeting = $scope.get_next_meeting()) ? $("#meeting-" + meeting.id).offset().top - 64 : 0;
-			var max = $("div.height").height();
-			if (max <= $(window).height() - 64) target = 0;
-			if (target > max) target = max;
-			//window.console.log('scrolling to ' + target);
-			$('html,body').animate({scrollTop: target}, 0);
-		}
-
-		$scope.reset_vars = function() {
-			$scope.selected_day = $scope.now.getDay();
-			$scope.selected_region = "";
-			$scope.scroll_to_now();
-		 	if ($("#collapse").hasClass("in")) $("#collapse").collapse("hide");
-		}
-
-		$scope.format_day = function() {
-			//if ($scope.selected_day == '') return "Any Day";
-			return $scope.days[$scope.selected_day]['value'];
-		}
-
-		$scope.format_region = function() {
-			if ($scope.selected_region == '') return "";
-			for (var i = 0; i < $scope.regions.length; i++) {
-				if ($scope.regions[i].id == $scope.selected_region) {
-					return $scope.regions[i].value;
-				}
-			}
-		}
-
-		$scope.format_time = function(time) {
-			var time_parts = time.split(':');
-			var hours = time_parts[0];
-			var minutes = time_parts[1];
-			if ((hours == 12) && (minutes == 0)) return 'Noon';
-			if ((hours == 23) && (minutes == 59)) return 'Mid';
-			if (hours < 12) return (hours - 0) + ':' + minutes + 'a';
-			if (hours == 12) return '12:' + minutes + 'p';
-			return (hours - 12) + ':' + minutes + 'p';
-		}
-
-		$scope.format_types = function(types) {
-			for (var i = 0; i < types.length; i++) {
-				if (types[i] == 'M') return "Men";
-				if (types[i] == 'W') return "Women";
-			}
-			return '';
-		}
-
-		$scope.set_day = function(day) {
-			$scope.selected_day = day.id;
-		 	$("#collapse").collapse("hide");
-		}
-
-		$scope.set_region = function(region) {
-			$scope.selected_region = (typeof region === 'undefined') ? "" : region.id;
-		 	$("#collapse").collapse("hide");
-		}
-
-		//update meetings & regions from our WordPress API (also open source)
-		$http
-			.get("http://aasanjose.org/wp-admin/admin-ajax.php?action=meetings")
-			.success(function(data, status, headers, config) {
-				$scope.meetings = data;
-
-				var regions = new Array();
-				var regionKeys = new Array(); //faster, i think, than looping
-
-				for (var i = 0; i < $scope.meetings.length; i++) {
-					//pre-format the meeting types, because on-the-fly formatting was throwing off scroll
-					$scope.meetings[i].types_formatted = $scope.format_types($scope.meetings[i].types);
-
-					//remember region
-					if (regionKeys.indexOf($scope.meetings[i].region) == -1) {
-						regionKeys[regionKeys.length] = $scope.meetings[i].region;
-						regions[regions.length] = {
-							id: $scope.meetings[i].region_id,
-							value: $scope.meetings[i].region
-						}
-					}
-				}
-
-				//sort regions by object value
-				function compare(a, b) {
-					if (a.value < b.value) return -1;
-					if (a.value > b.value) return 1;
-					return 0;
-				}
-				regions.sort(compare);
-
-				//export new regions variable and save to local storage
-				$scope.regions = regions;
-				localStorageService.add('meetings', data);
-				localStorageService.add('regions', regions);
-			});
-
+		$('html,body').animate({scrollTop: 0}, 0);
 	}]);
 
 /* for debugging scroll
