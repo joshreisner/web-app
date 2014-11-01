@@ -2,7 +2,7 @@
 //= include ../../bower_components/add-to-homescreen/src/addtohomescreen.js
 //= include ../../bower_components/angular/angular.min.js
 //= include ../../bower_components/angular-route/angular-route.js
-//= include ../../bower_components/angular-local-storage/angular-local-storage.min.js
+//= include ../../bower_components/angular-local-storage/dist/angular-local-storage.js
 //= include ../../bower_components/bootstrap-sass/dist/js/bootstrap.js
 
 angular
@@ -11,6 +11,7 @@ angular
 		return window.escape;
 	})
 	.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+	    $locationProvider.html5Mode(true);
 		$routeProvider.
 			when('/', {
 				templateUrl: '/partials/meetings.html',
@@ -27,7 +28,6 @@ angular
 			otherwise({
 				redirectTo: '/'
 			});
-	    $locationProvider.html5Mode(true);
 	}])
 	.run(['$rootScope', '$http', 'localStorageService', function($rootScope, $http, localStorageService) {
 
@@ -47,7 +47,7 @@ angular
 		$rootScope.meetings  = localStorageService.get('meetings') || new Array();
 		$rootScope.favorites = localStorageService.get('favorites') || new Array();
 
-		//get user's location
+		/*get user's location
 		$rootScope.userLocation = null;
 		if (window.navigator.standalone) {
 			navigator.geolocation.getCurrentPosition(foundLocation, noLocation, { timeout: 10000 });
@@ -57,7 +57,7 @@ angular
 			function noLocation() {
 				$rootScope.userLocation = false;
 			}
-		}
+		}*/
 
 		//update meetings & regions from our open source WordPress API
 		$http
@@ -155,10 +155,11 @@ angular
 		}
 		
 		$scope.scroll_to_now = function() {
-			var target = (meeting = $scope.get_next_meeting()) ? $("#meeting-" + meeting.id).offset().top - 64 : 0;
+			var target = (meeting = $scope.get_next_meeting()) ? $("#meeting-" + meeting.id).offset().top - 104 : 0;
 			var max = $("div.height").height();
 			if (max <= $(window).height() - 64) target = 0;
 			if (target > max) target = max;
+			//console.log('scrolling to ' + target);
 			$('html,body').animate({scrollTop: target}, 0);
 		}
 
@@ -215,14 +216,14 @@ angular
 		//get current meeting info
 		$scope.getMeeting = function(slug) {
 			for (var i = 0; i < $scope.meetings.length; i++) {
-				if ($scope.meetings[i].slug == slug) return $scope.meetings[i];
+				if ($rootScope.meetings[i].slug == slug) return $rootScope.meetings[i];
 			}
 			//todo redirect on 404
 		}
 
 		$scope.meeting = $scope.getMeeting($routeParams.slug);
 
-		$scope.meeting.distance = $rootScope.getDistanceInMi();
+		//$scope.meeting.distance = $rootScope.getDistanceInMi();
 		
 		function deg2rad(deg) {
 			return deg * (Math.PI/180);
@@ -272,12 +273,12 @@ angular
 		$('html,body').animate({scrollTop: 0}, 0);
 	}]);
 
-/* for debugging scroll
+// for debugging scroll
 $(function(){
 	$(window).on('scroll', function(){
-		window.console.log($(this).scrollTop());
+		//window.console.log($(this).scrollTop());
 	});
-}); */
+});
 
 //run thingy to prompt saving web app
 addToHomescreen();
