@@ -155,7 +155,7 @@ angular
 		}
 		
 		$scope.scroll_to_now = function() {
-			var target = (meeting = $scope.get_next_meeting()) ? $("#meeting-" + meeting.id).offset().top - 104 : 0;
+			var target = (meeting = $scope.get_next_meeting()) ? $("#meeting-" + meeting.id).offset().top - 64 : 0;
 			var max = $("div.height").height();
 			if (max <= $(window).height() - 64) target = 0;
 			if (target > max) target = max;
