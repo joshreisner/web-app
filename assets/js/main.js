@@ -31,15 +31,21 @@ angular
 	}])
 	.run(['$rootScope', '$http', 'localStorageService', function($rootScope, $http, localStorageService) {
 
-		//populate days dropdown
+		//console.log('rootScope starting up');
+
+		$rootScope.now = new Date();
+		$rootScope.today = $rootScope.now.getDay();
+		$rootScope.selected_day = $rootScope.today;
+		$rootScope.selected_region = '';
+		$rootScope.scrollPosition = null;
 		$rootScope.days = [
-			{ id: 0, value: "Sunday" }, 
-			{ id: 1, value: "Monday" },
-			{ id: 2, value: "Tuesday" }, 
-			{ id: 3, value: "Wednesday" }, 
-			{ id: 4, value: "Thursday" },
-			{ id: 5, value: "Friday" }, 
-			{ id: 6, value: "Saturday" }
+			{ id: 0, value: 'Sunday' }, 
+			{ id: 1, value: 'Monday' },
+			{ id: 2, value: 'Tuesday' }, 
+			{ id: 3, value: 'Wednesday' }, 
+			{ id: 4, value: 'Thursday' },
+			{ id: 5, value: 'Friday' }, 
+			{ id: 6, value: 'Saturday' }
 		];
 
 		//get stuff out of local storage
@@ -61,7 +67,7 @@ angular
 
 		//update meetings & regions from our open source WordPress API
 		$http
-			.get("http://aasanjose.org/wp-admin/admin-ajax.php?action=meetings")
+			.get('http://aasanjose.org/wp-admin/admin-ajax.php?action=meetings')
 			.success(function(data, status, headers, config) {
 				$rootScope.meetings = data;
 
@@ -124,29 +130,42 @@ angular
 
 		$rootScope.format_types = function(types) {
 			for (var i = 0; i < types.length; i++) {
-				if (types[i] == 'M') return "Men";
-				if (types[i] == 'W') return "Women";
+				if (types[i] == 'M') return '/ Men';
+				if (types[i] == 'W') return '/ Women';
 			}
 			return '';
 		}
 
+		$rootScope.rememberScroll = function(position) {
+			//console.log('remembering ' + position);
+			if ($rootScope.controller == 'meetings') {
+				$rootScope.scrollPosition = position;
+			}
+		}
+
 	}])
-	.controller('meetingsCtrl', ['$scope', function($scope) {
+	.controller('meetingsCtrl', ['$scope', '$rootScope', '$timeout', function($scope, $rootScope, $timeout) {
 
 		//initialize
-		$scope.now = new Date();
-		$scope.selected_day = $scope.now.getDay();
-		$scope.selected_region = "";
+		//console.log('meetings controller starting up');
+		$rootScope.controller = 'meetings';
+		$scope.selected_day = $rootScope.selected_day;
+		$scope.selected_region = $rootScope.selected_region;
 
-		//scroll to current time when filter is updated
-		$scope.$watch('filteredMeetings', function() {
-		     $scope.scroll_to_now();
-		}, true);
-		
+		//scroll to -- wish this was not a timeout, but have to wait for page to render
+		$timeout(function(){
+			if ($rootScope.scrollPosition === null) {
+				$scope.scroll_to_now();
+			} else {
+				//console.log('scrolling to remembered position of ' + $rootScope.scrollPosition);
+				$scope.scroll_to($rootScope.scrollPosition);
+			}
+		}, 200);
+
 		$scope.get_next_meeting = function() {
 			if (typeof $scope.filteredMeetings === 'undefined') return false;
-			var timestring = ($scope.now.getHours() < 10 ? '0' : '') + $scope.now.getHours() + ':';
-			timestring += ($scope.now.getMinutes() < 10 ? '0' : '') + $scope.now.getMinutes();
+			var timestring = ($rootScope.now.getHours() < 10 ? '0' : '') + $rootScope.now.getHours() + ':';
+			timestring += ($rootScope.now.getMinutes() < 10 ? '0' : '') + $rootScope.now.getMinutes();
 			//var timestring = '06:55'; //should scroll you to a 7am meeting
 			for (var i = 0; i < $scope.filteredMeetings.length; i++) {
 				if ($scope.filteredMeetings[i].time >= timestring) return $scope.filteredMeetings[i];
@@ -155,31 +174,38 @@ angular
 		}
 		
 		$scope.scroll_to_now = function() {
-			var target = (meeting = $scope.get_next_meeting()) ? $("#meeting-" + meeting.id).offset().top - 64 : 0;
-			var max = $("div.height").height();
+			//console.log('scrolling to now');
+			var position = (meeting = $scope.get_next_meeting()) ? $('#meeting-' + meeting.id).offset().top - 64 : 0;
+			$scope.scroll_to(position);
+		}
+
+		$scope.scroll_to = function(position) {
+			var max = $('div.height').height();
 			if (max <= $(window).height() - 64) target = 0;
-			if (target > max) target = max;
-			//console.log('scrolling to ' + target);
-			$('html,body').animate({scrollTop: target}, 0);
+			if (position > max) target = max;
+			//console.log('scrolling to ' + position);
+			$('html,body').animate({scrollTop: position}, 0);
 		}
 
 		$scope.reset_vars = function() {
-			$scope.selected_day = $scope.now.getDay();
-			$scope.selected_region = "";
-			$scope.scroll_to_now();
-		 	if ($("#collapse").hasClass("in")) $("#collapse").collapse("hide");
+			$rootScope.selected_day = $rootScope.now.getDay();
+			$rootScope.selected_region = '';
+			$timeout(function(){
+				$scope.scroll_to_now();
+			}, 200);
+		 	if ($('#collapse').hasClass('in')) $('#collapse').collapse('hide');
 		}
 
 		$scope.format_day = function() {
-			//if ($scope.selected_day == '') return "Any Day";
-			return $scope.days[$scope.selected_day]['value'];
+			//if ($rootScope.selected_day == '') return 'Any Day';
+			return $rootScope.days[$rootScope.selected_day]['value'];
 		}
 
 		$scope.format_region = function() {
-			if ($scope.selected_region == '') return "";
-			for (var i = 0; i < $scope.regions.length; i++) {
-				if ($scope.regions[i].id == $scope.selected_region) {
-					return $scope.regions[i].value;
+			if ($rootScope.selected_region == '') return '';
+			for (var i = 0; i < $rootScope.regions.length; i++) {
+				if ($rootScope.regions[i].id == $rootScope.selected_region) {
+					return $rootScope.regions[i].value;
 				}
 			}
 		}
@@ -196,16 +222,28 @@ angular
 		}
 
 		$scope.set_day = function(day) {
-			$scope.selected_day = day.id;
-		 	$("#collapse").collapse("hide");
+			$rootScope.selected_day = day.id;
+			$scope.selected_day = $rootScope.selected_day;
+			$scope.scroll_to(0);
+		 	$('#collapse').collapse('hide');
 		}
 
 		$scope.set_region = function(region) {
-			$scope.selected_region = (typeof region === 'undefined') ? "" : region.id;
-		 	$("#collapse").collapse("hide");
+			$rootScope.selected_region = (typeof region === 'undefined') ? '' : region.id;
+			$scope.selected_region = $rootScope.selected_region;
+			$scope.scroll_to(0);
+		 	$('#collapse').collapse('hide');
 		}
+
+		//remember scroll position
+		$(window).on('scroll', function(){
+			//console.log($(this).scrollTop())
+			$rootScope.rememberScroll($(this).scrollTop());
+		});
 	}])
 	.controller('meetingDetailCtrl', ['$scope', '$rootScope', '$routeParams', '$window', '$location', 'localStorageService', function($scope, $rootScope, $routeParams, $window, $location, localStorageService) {
+
+		$rootScope.controller = 'detail';
 
 		$scope.$on('$viewContentLoaded', function(event) {
 			$window.ga('send', 'pageview', { page: $location.path() });
@@ -262,10 +300,11 @@ angular
 			
 			localStorageService.add('meetings', $scope.meetings);
 			localStorageService.add('favorites', $scope.favorites);
-
 		}
 	}])
-	.controller('helpCtrl', ['$window', '$location', function($window, $location) {
+	.controller('helpCtrl', ['$scope', '$rootScope', '$window', '$location', function($scope, $rootScope, $window, $location) {
+		$rootScope.controller = 'help';
+
 		$scope.$on('$viewContentLoaded', function(event) {
 			$window.ga('send', 'pageview', { page: $location.path() });
 		});
@@ -273,15 +312,9 @@ angular
 		$('html,body').animate({scrollTop: 0}, 0);
 	}]);
 
-// for debugging scroll
-$(function(){
-	$(window).on('scroll', function(){
-		//window.console.log($(this).scrollTop());
-	});
-});
-
 //run thingy to prompt saving web app
 addToHomescreen();
+
 
 //google analytics
 (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=

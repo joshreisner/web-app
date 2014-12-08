@@ -7,7 +7,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" ng-cloak ng-click="reset_vars()"><span ng-bind="format_day()"></span><span ng-if="format_region()">, </span><span ng-bind="format_region()"></span></a>
+			<a class="navbar-brand" ng-cloak><span ng-bind="format_day()"></span><span ng-if="format_region()">, </span><span ng-bind="format_region()"></span></a>
 		</div>
 		<div class="collapse navbar-collapse" id="collapse">
 			<ul class="nav navbar-nav">
@@ -28,7 +28,9 @@
 						<li ng-repeat="region in regions" ng-class="{'active': (region.id == selected_region)}"><a ng-click="set_region(region)">{{ region.value }}</a></li>
 					</ul>
 				</li>
-				<li><a href="#help"><i class="glyphicon glyphicon-question-sign"></i> Help &amp; Feedback</a></li>
+				<li><a href="/help"><i class="glyphicon glyphicon-question-sign"></i> Help &amp; Feedback</a></li>
+				<li class="divider"></li>
+				<li><a ng-click="reset_vars()"><i class="glyphicon glyphicon-ban-circle"></i> Go to Now</a></li>
 			</ul>
 		</div>
 	</div>

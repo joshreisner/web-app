@@ -8,9 +8,6 @@ $white: 		#ffffff
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak
 	visibility: hidden !important
 
-html, body, .container, .list-group
-	height: 100%
-
 a
 	cursor: pointer
 
@@ -18,7 +15,7 @@ body
 	background-color: #eee
 
 	.navbar-inverse
-		font-size: 15px
+		font-size: 17px
 		padding-top: 13px
 
 		a.navbar-brand
@@ -27,13 +24,17 @@ body
 			padding-right: 0
 			overflow: hidden
 			white-space: nowrap
+
+		i.glyphicon
+			margin-right: 5px
 		
+		.divider
+			background-color: $gray-dark
+			height: 1px
+
 		.dropdown-menu
 			font-size: inherit
 			
-			.divider
-				background-color: $gray-dark
-
 	.list-group
 		margin: 63px -15px 0
 		position: relative
@@ -61,8 +62,8 @@ body
 					color: $primary
 					font-weight: normal
 					white-space: nowrap
-					&::before
-						content: " / "
+					//&::before
+					//	content: " / "
 
 			a.location
 				float: left
@@ -119,14 +120,12 @@ body
 		li.loading
 			list-style-type: none
 			background: white url(/assets/img/spinner.gif) center center no-repeat
-			position: absolute
+			position: fixed
 			top: 0
-			bottom: 20px
+			bottom: 0
 			left: 0
 			right: 0
-
-			&:last-child
-				border-bottom: 0
+			border-bottom: 0
 
 	.help
 		margin: 0 -15px
