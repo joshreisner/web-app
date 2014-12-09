@@ -1,0 +1,18 @@
+CACHE MANIFEST
+# rev 2
+NETWORK:
+http://maps.googleapis.com/
+CACHE:
+/assets/css/main.min.css
+/assets/fonts/glyphicons-halflings-regular.eot
+/assets/fonts/glyphicons-halflings-regular.svg
+/assets/fonts/glyphicons-halflings-regular.ttf
+/assets/fonts/glyphicons-halflings-regular.woff
+/assets/img/apple-touch-icon.png
+/assets/img/spinner.png
+/assets/img/startup-640-1096.png
+/assets/img/startup.png
+/assets/js/main.min.js
+/partials/help.html
+/partials/meeting-detail.html
+/partials/meetings.html
