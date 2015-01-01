@@ -1,7 +1,11 @@
 CACHE MANIFEST
-# rev 2
+# rev 6
 NETWORK:
 http://maps.googleapis.com/
+http://www.google-analytics.com/analytics.js
+http://www.google-analytics.com/collect
+http://www.google-analytics.com/r/collect
+http://aasanjose.org/wp-admin/admin-ajax.php?action=meetings
 CACHE:
 /assets/css/main.min.css
 /assets/fonts/glyphicons-halflings-regular.eot
@@ -9,7 +13,7 @@ CACHE:
 /assets/fonts/glyphicons-halflings-regular.ttf
 /assets/fonts/glyphicons-halflings-regular.woff
 /assets/img/apple-touch-icon.png
-/assets/img/spinner.png
+/assets/img/spinner.gif
 /assets/img/startup-640-1096.png
 /assets/img/startup.png
 /assets/js/main.min.js
