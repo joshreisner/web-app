@@ -3,7 +3,7 @@
 //= include ../../bower_components/angular/angular.min.js
 //= include ../../bower_components/angular-route/angular-route.js
 //= include ../../bower_components/angular-local-storage/dist/angular-local-storage.js
-//= include ../../bower_components/bootstrap-sass/dist/js/bootstrap.js
+//= include ../../bower_components/bootstrap-sass/assets/javascripts/bootstrap.js
 
 angular
 	.module('meetingsApp', ['ngRoute', 'LocalStorageModule'])
