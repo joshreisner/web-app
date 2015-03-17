@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# rev 7
+# rev 8
 NETWORK:
 http://maps.googleapis.com/
 http://www.google-analytics.com/analytics.js
@@ -8,15 +8,16 @@ http://www.google-analytics.com/r/collect
 http://aasanjose.org/wp-admin/admin-ajax.php?action=meetings
 CACHE:
 /assets/css/main.min.css
-/assets/fonts/glyphicons-halflings-regular.eot
-/assets/fonts/glyphicons-halflings-regular.svg
-/assets/fonts/glyphicons-halflings-regular.ttf
-/assets/fonts/glyphicons-halflings-regular.woff
+/assets/fonts/bootstrap/glyphicons-halflings-regular.eot
+/assets/fonts/bootstrap/glyphicons-halflings-regular.svg
+/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf
+/assets/fonts/bootstrap/glyphicons-halflings-regular.woff
 /assets/img/apple-touch-icon.png
 /assets/img/spinner.gif
 /assets/img/startup-640-1096.png
 /assets/img/startup.png
 /assets/js/main.min.js
+/favicon.ico
 /partials/help.html
 /partials/meeting-detail.html
 /partials/meetings.html
