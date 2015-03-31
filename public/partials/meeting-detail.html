@@ -6,7 +6,7 @@
 
 <div class="meeting-detail">
 	<div ng-cloak>
-		<h1>{{ meeting.name }}</h1>
+		<h1 ng-bind="meeting.name"></h1>
 
 		<h4>
 			{{ days[meeting.day].value }}s, {{ meeting.time_formatted }}
