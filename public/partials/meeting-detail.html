@@ -19,6 +19,8 @@
 				{{ meeting.city }}, {{ meeting.state }}
 			</a>
 		</address>
+		
+		<p ng-if="meeting.notes">{{ meeting.notes }}</p>
 
 		<!--
 		<div class="alert alert-info" ng-if="meeting.distance > 0">
