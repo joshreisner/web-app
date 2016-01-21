@@ -67,7 +67,7 @@ angular
 
 		//update meetings & regions from our open source WordPress API
 		$http
-			.get('http://aasanjose.org/wp-admin/admin-ajax.php?action=meetings')
+			.get('https://aasanjose.org/wp-admin/admin-ajax.php?action=meetings')
 			.success(function(data, status, headers, config) {
 				$rootScope.meetings = data;
 
