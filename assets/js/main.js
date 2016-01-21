@@ -313,7 +313,7 @@ angular
 	}]);
 
 //run thingy to prompt saving web app
-addToHomescreen();
+addToHomescreen({debug:false});
 
 
 //google analytics
