@@ -1,16 +1,7 @@
 CACHE MANIFEST
-# rev 14
+# rev 15
 NETWORK:
-http://maps.googleapis.com/
-https://maps.googleapis.com/
-https://www.google-analytics.com/analytics.js
-https://www.google-analytics.com/collect
-https://www.google-analytics.com/r/collect
-http://www.google-analytics.com/analytics.js
-http://www.google-analytics.com/collect
-http://www.google-analytics.com/r/collect
-http://aasanjose.org/wp-admin/admin-ajax.php?action=meetings
-https://aasanjose.org/wp-admin/admin-ajax.php?action=meetings
+*
 CACHE:
 /assets/css/main.min.css
 /assets/fonts/bootstrap/glyphicons-halflings-regular.eot
