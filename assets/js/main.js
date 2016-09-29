@@ -84,6 +84,10 @@ angular
 					} else {
 						$rootScope.meetings[i].favorite = false;
 					}
+					
+					$rootScope.meetings[i].address = $rootScope.meetings[i].formatted_address;
+					var pos = $rootScope.meetings[i].address.indexOf(',');
+					if (pos !== -1) $rootScope.meetings[i].address = $rootScope.meetings[i].address.substring(0, pos);
 
 					//remember region
 					if (regionKeys.indexOf($rootScope.meetings[i].region) == -1) {
